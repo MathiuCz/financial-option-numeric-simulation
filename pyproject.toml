@@ -1,0 +1,14 @@
+[project]
+name = "opciones-financieras"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "matplotlib>=3.11.0",
+    "numpy>=2.4.6",
+    "pandas>=3.0.3",
+    "polars>=1.41.2",
+    "scipy>=1.17.1",
+    "yfinance>=1.4.1",
+]

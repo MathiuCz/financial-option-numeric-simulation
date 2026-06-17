@@ -12,3 +12,6 @@ dependencies = [
     "scipy>=1.17.1",
     "yfinance>=1.4.1",
 ]
+
+[tool.pyright]
+extraPaths = ["."]

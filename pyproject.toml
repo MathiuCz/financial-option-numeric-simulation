@@ -9,9 +9,13 @@ dependencies = [
     "numpy>=2.4.6",
     "pandas>=3.0.3",
     "polars>=1.41.2",
+    "pytest>=9.1.0",
     "scipy>=1.17.1",
     "yfinance>=1.4.1",
 ]
 
 [tool.pyright]
 extraPaths = ["."]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]

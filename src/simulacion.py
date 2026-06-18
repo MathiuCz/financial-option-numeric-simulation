@@ -77,24 +77,35 @@ class MonteCarloGBM:
         self.S_T = trayectorias[:, M]
         return self.trayectorias
 
-    def prob_ITM(self, K:float)-> float:
+    def prob_ITM(self, K: float, tipo: str = "call") -> float:
         if self.S_T is None:
             raise ValueError("Ejecuta simular antes de calcular la probabilidad ITM")
         
-        prob = np.mean(self.S_T > K)
+        tipo = tipo.lower()
+        if tipo == "call":
+            prob = np.mean(self.S_T > K)
+        elif tipo == "put":
+            prob = np.mean(self.S_T < K)
+        else:
+            raise ValueError("El tipo de opcion debe ser 'call' o 'put'")
+            
         self.prob_itm = prob
         return self.prob_itm
 
-    def resumen(self, K: float) -> None:
+    def resumen(self, K: float, tipo: str = "call") -> None:
         if self.S_T is None:
             raise ValueError("Ejecuta simular() antes de mostrar el resumen")
 
-        prob = self.prob_ITM(K)
-        print(f"S0                 : {self.S0:.2f}")
-        print(f"K (strike)         : {K:.2f}")
-        print(f"E[S_T]             : {self.S_T.mean():.2f}")
-        print(f"std[S_T]           : {self.S_T.std():.2f}")
-        print(f"P(S_T > K) empir.  : {prob:.4f}")
+        prob = self.prob_ITM(K, tipo=tipo)
+        print(f"S0                 : {self.S0:.2f} (Precio subyacente)")
+        print(f"K (strike)         : {K:.2f} (Precio strike)")
+        print(f"Tipo de Opcion     : {tipo.upper()}")
+        print(f"E[S_T]             : {self.S_T.mean():.2f} (Precio esperado)")
+        print(f"std[S_T]           : {self.S_T.std():.2f} (Desviacion estandar)")
+        if tipo.lower() == "call":
+            print(f"P(S_T > K) empir.  : {prob:.4f} (Probabilidad de terminar ITM)")
+        else:
+            print(f"P(S_T < K) empir.  : {prob:.4f} (Probabilidad de terminar ITM)")
 
 if __name__ == "__main__":
     activo = DatosSubyacente("SPY", "2022-05-01", "2026-05-30")

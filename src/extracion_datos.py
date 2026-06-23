@@ -28,7 +28,7 @@ class DatosSubyacente:
             raise ValueError("No se pudieron descargar los datos de precios.")
         
         # Calculamos los log-retornos y los agregamos como una columna en el DataFrame completo
-        self.datos['Log_Returns'] = np.log(self.datos['Close'] / self.datos['Close'].shift(1))
+        self.datos['Log_Returns'] = np.log(self.datos['Close'] / self.datos['Close'].shift(1)) #shift desplaza una posicion hacia adelante
         
         # self.retornos almacena los valores sin el NaN inicial para compatibilidad
         retornos = self.datos['Log_Returns'].dropna().to_numpy()

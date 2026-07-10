@@ -55,7 +55,7 @@ class MonteCarloGBM:
         self.S_T = None
         self.prob_itm = None
 
-    def simular(self, T: float, M: int, N: int, seed:int = None)-> np.ndarray:
+    def simular(self, T: float, n_pasos: int, n_sim: int, seed: int = None) -> np.ndarray:
         if self.calibrador.mu is None or self.calibrador.sigma is None:
             self.calibrador.estimar()
         
@@ -64,17 +64,17 @@ class MonteCarloGBM:
 
         mu = self.calibrador.mu
         sigma = self.calibrador.sigma
-        dt = T/M
+        dt = T / n_pasos  # n_pasos de tiempo
         
-        trayectorias = np.zeros((N, M+1))
+        trayectorias = np.zeros((n_sim, n_pasos + 1))
         trayectorias[:, 0] = self.S0
 
-        for j in range(M):
-            Z = np.random.standard_normal(N) #Vectorizado sobre las N trayectorias
+        for j in range(n_pasos):
+            Z = np.random.standard_normal(n_sim)  # Vectorizado sobre las n_sim trayectorias
             trayectorias[:, j+1] = trayectorias[:, j] * np.exp((mu - sigma**2/2)*dt + sigma*np.sqrt(dt)*Z)
 
         self.trayectorias = trayectorias
-        self.S_T = trayectorias[:, M]
+        self.S_T = trayectorias[:, n_pasos]
         return self.trayectorias
 
     def prob_ITM(self, K: float, tipo: str = "call") -> float:
@@ -119,13 +119,6 @@ if __name__ == "__main__":
     print()
 
     mc = MonteCarloGBM(calibrador)
-    mc.simular(T=0.5, M=252, N=10_000, seed=42)
+    mc.simular(T=0.5, n_pasos=252, n_sim=10_000, seed=42)
     mc.resumen(K=calibrador.activo.precios[-1] * 1.05)  # K 5% sobre el precio actual
-
-            
-        
     
-        
-        
-        
-        

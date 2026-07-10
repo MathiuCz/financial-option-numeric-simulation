@@ -28,7 +28,7 @@ def test_montecarlo_gbm():
     
     # Probamos el simulador de Monte Carlo
     mc = MonteCarloGBM(calibrador)
-    trayectorias = mc.simular(T=0.5, M=126, N=1000, seed=42)
+    trayectorias = mc.simular(T=0.5, n_pasos=126, n_sim=1000, seed=42)
     
     # Verificaciones
     assert trayectorias is not None

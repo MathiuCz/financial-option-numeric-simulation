@@ -144,3 +144,52 @@ Y la **Matriz B** (Lado derecho, conocidos) tiene:
 *   Diagonal superior: $\gamma_j$
 
 Para avanzar un paso temporal, simplemente construimos el lado derecho ($b = B \cdot V^{n+1}$) y resolvemos el sistema lineal $A \cdot V^n = b$ para encontrar los precios del paso actual. ¡Y así iteramos hasta llegar a $t=0$!
+
+---
+
+## 8. Análisis de Estabilidad de Von Neumann
+
+Para justificar la **estabilidad incondicional** del esquema de Crank-Nicolson, se realiza el análisis de estabilidad de Von Neumann. Este análisis asume rigurosamente coeficientes constantes, por lo que aplicamos la técnica de "coeficientes congelados" (asumimos $S$ constante localmente para el análisis del error en un nodo $j$).
+
+Sustituimos un error en forma de onda plana o modo de Fourier:
+$$ V_j^n = \xi^n e^{i k j \Delta S} $$
+Donde $\xi^n$ es la amplitud del error en el paso de tiempo $n$, $k$ es el número de onda espacial y $i$ es la unidad imaginaria.
+
+Si introducimos esto en nuestra ecuación discreta global y factorizamos $\xi^n$ y $\xi^{n+1}$:
+$$ \xi^n \left[ (1 - \beta_j) - \alpha_j e^{-ik\Delta S} - \gamma_j e^{ik\Delta S} \right] = \xi^{n+1} \left[ (1 + \beta_j) + \alpha_j e^{-ik\Delta S} + \gamma_j e^{ik\Delta S} \right] $$
+
+Para simplificar, definamos un número complejo $Z$:
+$$ Z = \alpha_j e^{-ik\Delta S} + \beta_j + \gamma_j e^{ik\Delta S} $$
+
+Por lo tanto, la ecuación se reduce a:
+$$ \xi^n (1 - Z) = \xi^{n+1} (1 + Z) $$
+
+Como marchamos hacia atrás en el tiempo (de $n+1$ a $n$), el factor de amplificación $G$ que determina cómo crece el error es la proporción entre el paso futuro calculado ($n$) y el paso anterior conocido ($n+1$):
+$$ G = \frac{\xi^n}{\xi^{n+1}} = \frac{1 + Z}{1 - Z} $$
+
+Usemos la identidad de Euler ($e^{\pm ix} = \cos x \pm i \sin x$) para separar $Z$ en su parte real e imaginaria:
+$$ \text{Re}(Z) = (\alpha_j + \gamma_j)\cos(k\Delta S) + \beta_j $$
+$$ \text{Im}(Z) = (\gamma_j - \alpha_j)\sin(k\Delta S) $$
+
+Recordemos la definición de nuestros coeficientes:
+* $\alpha_j + \gamma_j = 0.5 \cdot \Delta t \cdot \sigma^2 j^2$
+* $\beta_j = -0.5 \cdot \Delta t \cdot (\sigma^2 j^2 + r)$
+
+Sustituyendo esto en la parte real:
+$$ \text{Re}(Z) = 0.5 \Delta t \sigma^2 j^2 \cos(k\Delta S) - 0.5 \Delta t (\sigma^2 j^2 + r) $$
+Agrupando, tenemos:
+$$ \text{Re}(Z) = -0.5 \Delta t \sigma^2 j^2 \left( 1 - \cos(k\Delta S) \right) - 0.5 \Delta t r $$
+
+Dado que la función $\cos$ nunca es mayor a $1$, el término $(1 - \cos)$ es siempre $\ge 0$. Como $\Delta t$, $\sigma^2$ y $r$ también son positivos, es estrictamente cierto que:
+$$ \text{Re}(Z) \le 0 $$
+
+Definamos $M = -\text{Re}(Z)$ (donde $M \ge 0$) y $N = \text{Im}(Z)$. Entonces nuestro factor de amplificación es:
+$$ G = \frac{1 - M + iN}{1 + M - iN} $$
+
+El tamaño o magnitud al cuadrado del factor de amplificación $|G|^2$ (que debe ser $\le 1$ para que el método no "explote") es:
+$$ |G|^2 = \frac{(1 - M)^2 + N^2}{(1 + M)^2 + N^2} $$
+
+Dado que $M \ge 0$, es obvio matemáticamente que $(1 - M)^2 \le (1 + M)^2$. Por lo tanto, el denominador siempre será mayor o igual al numerador, concluyendo que:
+$$ |G| \le 1 $$
+
+¡Esta desigualdad se cumple para **cualquier valor** de $\Delta t$ o $\Delta S$! Esto significa que los errores no se amplificarán a medida que iteramos en el tiempo, demostrando que **el esquema de Crank-Nicolson es incondicionalmente estable**.
